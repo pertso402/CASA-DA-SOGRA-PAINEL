@@ -661,13 +661,16 @@ async function loadPedidos(){
     
     // Filtra para exibir apenas pedidos concluídos e os que já estão no fluxo do painel (incluindo confirmed legado)
     const validStatuses = ['concluido', 'confirmed', 'novo', 'preparo', 'pronto', 'entregue'];
-    const filtered = (data || []).filter(p => validStatuses.includes(p.status));
+    const filtered = (data || []).filter(p => p.status && validStatuses.includes(p.status.toLowerCase()));
     
     // Mapeia 'concluido' (e 'confirmed' antigo) → 'novo' para exibição
-    const mapped = filtered.map(p => ({
-      ...p,
-      status: (p.status === 'concluido' || p.status === 'confirmed') ? 'novo' : p.status
-    }));
+    const mapped = filtered.map(p => {
+      const st = p.status.toLowerCase();
+      return {
+        ...p,
+        status: (st === 'concluido' || st === 'confirmed') ? 'novo' : st
+      };
+    });
     
     // Logic to notify new entries
     const novos = mapped.filter(p => !pedidos.find(e => e.id === p.id));
