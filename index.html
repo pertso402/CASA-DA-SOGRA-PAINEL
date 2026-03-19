@@ -659,10 +659,14 @@ async function loadPedidos(){
   try{
     const data = await sb('orders','GET',null,`?order=created_at.desc`);
     
-    // Map 'confirmed' or 'pending' status (incoming from menu) → 'novo' for display
-    const mapped = (data || []).map(p => ({
+    // Filtra para exibir apenas pedidos concluídos e os que já estão no fluxo do painel (incluindo confirmed legado)
+    const validStatuses = ['concluido', 'confirmed', 'novo', 'preparo', 'pronto', 'entregue'];
+    const filtered = (data || []).filter(p => validStatuses.includes(p.status));
+    
+    // Mapeia 'concluido' (e 'confirmed' antigo) → 'novo' para exibição
+    const mapped = filtered.map(p => ({
       ...p,
-      status: (p.status === 'confirmed' || p.status === 'pending') ? 'novo' : p.status
+      status: (p.status === 'concluido' || p.status === 'confirmed') ? 'novo' : p.status
     }));
     
     // Logic to notify new entries
@@ -915,7 +919,7 @@ async function saveNewOrder(){
     address: address,
     items: items,
     total: total,
-    status: 'confirmed'
+    status: 'concluido'
   };
 
   try{
