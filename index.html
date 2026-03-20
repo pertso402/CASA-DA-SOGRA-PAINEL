@@ -660,7 +660,7 @@ async function loadPedidos(){
     const data = await sb('orders','GET',null,`?order=created_at.desc`);
     
     // Filtra para exibir apenas pedidos concluídos e os que já estão no fluxo do painel (incluindo confirmed legado)
-    const validStatuses = ['concluido', 'confirmed', 'novo', 'preparo', 'pronto', 'entregue'];
+    const validStatuses = ['concluido', 'confirmed', 'preparo', 'pronto', 'entregue'];
     const filtered = (data || []).filter(p => p.status && validStatuses.includes(p.status.toLowerCase()));
     
     // Mapeia 'concluido' (e 'confirmed' antigo) → 'novo' para exibição
